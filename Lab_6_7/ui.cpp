@@ -2,8 +2,12 @@
 #include "service.h"
 #include "validator.h"
 #include "entities.h"
+#include "DTO.h"
 #include <iostream>
 #include <string>
+#include <regex>
+
+#include <assert.h>
 void UI::afiseazaLista(const std::vector<Masina>& masini) {
 	if (masini.empty()) {
 		std::cout << "Nu exista masini care sa corespunda criteriilor.\n";
@@ -25,7 +29,10 @@ void UI::showUI() {
 		std::cout << "4. Cauta masina\n";
 		std::cout << "5. Filtreaza masini (producator sau tip)\n";
 		std::cout << "6. Sorteaza masini (dupa nr. inmatriculare, tip, producator + model)\n";
+		std::cout << "l. Creare Lista de lucru\n";
+		std::cout << "d. Frecventa producator\n";
 		std::cout << "a. Afiseaza toate masinile\n";
+		std::cout << "u. Undo\n";
 		std::cout << "0. Iesire\n";
 
 		std::string comanda;
@@ -55,6 +62,7 @@ void UI::showUI() {
 			std::cin >> tip;
 
 			try {
+				assert(&srv != nullptr);
 				srv.add(id, nrInmatriculare, producator, model, tip);
 				std::cout << "Masina adaugata cu succes!\n";
 			}
@@ -74,6 +82,7 @@ void UI::showUI() {
 			std::string id;
 			std::cin >> id;
 			try {
+				assert(&srv != nullptr);
 				srv.sterge(id);
 				std::cout << "Masina stearsa cu succes!\n";
 			}
@@ -110,6 +119,7 @@ void UI::showUI() {
 			std::cin >> tip_nou;
 
 			try {
+				assert(&srv != nullptr);
 				srv.modifica(id, nrInmatriculare_nou, producator_nou, model_nou, tip_nou);
 				std::cout << "Masina modificata cu succes!\n";
 			}
@@ -127,28 +137,29 @@ void UI::showUI() {
 		else if (comanda == "4") {
 			std::cout << "Cauta masina\n";
 
-			//std::cout << "Id: ";
-			std::string id = "garbageValue";
-			//std::cin >> id;
+			std::cout << "Id: ";
+			std::string id;
+			std::cin >> id;
 
-			std::cout << "Nr. Inmatriculare: ";
-			std::string nrInmatriculare;
-			std::cin >> nrInmatriculare;
+			//std::cout << "Nr. Inmatriculare: ";
+			//std::string nrInmatriculare;
+			//std::cin >> nrInmatriculare;
 
-			std::cout << "Producator: ";
-			std::string producator;
-			std::cin >> producator;
+			//std::cout << "Producator: ";
+			//std::string producator;
+			//std::cin >> producator;
 
-			std::cout << "Model: ";
-			std::string model;
-			std::cin >> model;
+			//std::cout << "Model: ";
+			//std::string model;
+			//std::cin >> model;
 
-			std::cout << "Tip: ";
-			std::string tip;
-			std::cin >> tip;
+			//std::cout << "Tip: ";
+			//std::string tip;
+			//std::cin >> tip;
 
 			try {
-				const Masina m = srv.cauta(Masina(id, nrInmatriculare, producator, model, tip));
+				assert(&srv != nullptr);
+				const Masina& m = srv.cauta(id);
 				std::cout << "Masina gasita!\n";
 				std::cout << "Id: " << m.getId() << " | " << "Nr. inmatriculare: " << m.getNrInmatriculare() << " | " << "Producator: " << m.getProducator() << " | " << "Model: " << m.getModel() << " | " << "Tip: " << m.getTip() << " | " << "\n";
 			}
@@ -164,6 +175,7 @@ void UI::showUI() {
 			std::cout << "Valoarea cautata: ";
 			std::cin >> valoare;
 
+			assert(&srv != nullptr);
 			afiseazaLista(srv.filtreazaGeneral(criteriu, valoare));
 		}
 
@@ -183,14 +195,96 @@ void UI::showUI() {
 				std::cout << "Trebuie sa fie crecsator(c) sau descrescator(d)\n";
 				continue;
 			}
-			
+
+			assert(&srv != nullptr);
 			afiseazaLista(srv.sorteazaGeneral(criteriu, crescator));
 
 			
 		}
 
+		else if (comanda == "l") {
+			assert(&srv != nullptr);
+			bool afiseazaNrTotalMasini = true;
+			std::cout << "Goleste - Goleste lista\n";
+			std::cout << "Adauga -  Adauga in lista\n";
+			std::cout << "Genereaza - Genereaza lista\n";
+			std::cout << "Export - Exporteaza in CSV\n";
+
+			std::string comandaMica;
+
+			std::cin >> comandaMica;
+			if (comandaMica == "goleste") {
+				srv.golesteLista();
+			}
+
+			else if (comandaMica == "adauga") {
+				std::cout << "Nr Inmatriculare: ";
+				std::string nrInmatriculareDeAdaugat;
+				std::cin >> nrInmatriculareDeAdaugat;
+				try {
+					srv.adaugaInLista(nrInmatriculareDeAdaugat);
+					std::cout << "Masina cu nr inmatriculare " << nrInmatriculareDeAdaugat << " a fost adaugata cu succes!\n";
+				}
+				catch (const RepoException &re){
+					std::cout << re.getMessage();
+				}
+			}
+
+			else if (comandaMica == "genereaza") {
+				std::cout << "Cate elemente sa generez in lista? ";
+				std::string cateElemente;
+				std::cin >> cateElemente;
+				std::regex pattern("^[1-9][0-9]*$");
+				if (!std::regex_match(cateElemente, pattern)) {
+					std::cout << "Numar invalid\n";
+					continue;
+				}
+				srv.genereazaListaAleatorie(std::stoi(cateElemente));
+				std::cout << "Am generat " << std::min(size_t(stoi(cateElemente)), srv.getAll().size()) << " masini!\n";
+
+			}
+
+			else if (comandaMica == "export") {
+				std::cout << "Nume fisier (.csv): ";
+				std::string numeFisier;
+				std::cin >> numeFisier;
+				srv.exportaListaCSV(numeFisier);
+				std::cout << "Exportat cu succes in fisierul " << numeFisier << ".csv!\n";
+			}
+
+			else {
+				afiseazaNrTotalMasini = false;
+				std::cout << "Nu stiu ce e acea comanda :/\n";
+			}
+			if (afiseazaNrTotalMasini) {
+				std::cout << srv.getAllLista().size() << " masini in lista\n";
+			}
+
+		}
+
+		else if (comanda == "d") {
+			assert(&srv != nullptr);
+			std::cout << "Producator: ";
+			std::string producatorDeNumarat;
+			std::cin >> producatorDeNumarat;
+			std::map<std::string, DTO> transferator = srv.frecventaProducator(producatorDeNumarat);
+			std::cout << transferator[producatorDeNumarat].getCheie() << " : " << transferator[producatorDeNumarat].getValoare() << "\n";
+		}
+
 		else if (comanda == "a") {
+			assert(&srv != nullptr);
 			afiseazaLista(srv.getAll());
+
+		}
+		else if (comanda == "u") {
+			try {
+				assert(&srv != nullptr);
+				srv.undo();
+				std::cout << "Undo realizat cu succes!\n";
+			}
+			catch (const RepoException& re) {
+				std::cout << re.getMessage();
+			}
 
 		}
 		else if (comanda == "0") {

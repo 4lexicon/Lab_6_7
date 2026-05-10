@@ -43,11 +43,9 @@ bool MasinaValidator::valideaza(const Masina& m) const {
 		errors += "Tipul nu poate fi vid\n";
 	}
 
-	if (errors.empty()) {
-		return true;
-	}
-	else {
+	if (!errors.empty()) {
 		throw ValidatorException(errors);
 	}
+		return true;
 
 }

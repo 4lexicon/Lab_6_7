@@ -31,7 +31,7 @@ public:
 
 
 	Masina(const Masina& ot) : id{ ot.id }, nrInmatriculare{ ot.nrInmatriculare }, producator{ ot.producator }, model{ ot.model }, tip{ ot.tip } {
-		std::cout << "COPIE " << "\n";
+		std::cout << "Copy Constructor\n";
 	} // Copy Constructor
 
 	//Copy Assignment Operator
@@ -48,7 +48,7 @@ public:
 		std::swap(this->producator, copie.producator);
 		std::swap(this->model, copie.model);
 		std::swap(this->tip, copie.tip);
-
+		std::cout << "Copy Assignment Operator\n";
 		return *this;
 	}
 
@@ -65,26 +65,39 @@ public:
 
 	// Move Constructor ver 2
 	Masina(Masina&& other) noexcept :
-		id(std::move(other.id)),
-		nrInmatriculare(std::move(other.nrInmatriculare)),
-		producator(std::move(other.producator)),
-		model(std::move(other.model)),
-		tip(std::move(other.tip))
+		id{ std::move(other.id) },
+		nrInmatriculare{ std::move(other.nrInmatriculare) },
+		producator{ std::move(other.producator) },
+		model{std::move(other.model)},
+		tip{std::move(other.tip)}
 	{
+		std::cout << "Move Constructor\n";
 
 	}// move e mai eficient
 	 // valorile care sunt mutate vor fi "resetate" la ""
 
 	// Move Assignment Operator
 	Masina& operator = (Masina&& other) noexcept {
-		if (this != &other) {
-			id = std::move(other.id);
-			nrInmatriculare = std::move(other.nrInmatriculare);
-			producator = std::move(other.producator);
-			model = std::move(other.model);
-			tip = std::move(other.tip);
+		if (this == &other) {
+			return *this;
 		}
+
+		id = std::move(other.id);
+		nrInmatriculare = std::move(other.nrInmatriculare);
+		producator = std::move(other.producator);
+		model = std::move(other.model);
+		tip = std::move(other.tip);
+		
+		std::cout << "Move Assignment Operator\n";
 		return *this;
+	}
+
+	bool operator == (const Masina& ot) const noexcept{
+		return this->id == ot.id &&
+			this->nrInmatriculare == ot.nrInmatriculare &&
+			this->producator == ot.producator &&
+			this->model == ot.model &&
+			this->tip == ot.tip;
 	}
 
 	// constructor manual de distrugere

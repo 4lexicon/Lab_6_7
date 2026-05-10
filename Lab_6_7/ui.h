@@ -9,6 +9,14 @@ public:
 	UI(MasinaService& service) noexcept : srv{ service } {
 		
 	}
+
+	/*
+	* Afiseaza UI
+	*/
 	void showUI();
+
+	/*
+	* Afiseaza o lista de masini, pe baze unui vector de masini
+	*/
 	void afiseazaLista(const std::vector<Masina>& masini);
 };
