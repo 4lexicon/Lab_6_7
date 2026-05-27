@@ -7,6 +7,8 @@
 #include "tests.h"
 #include <iostream>
 #include <crtdbg.h>
+
+
 #define _CRTDBG_MAP_ALLOC
 
 int main() {
@@ -15,7 +17,7 @@ int main() {
 	//testAdd(); 
 	t.testAll(); 
 
-
+	QWidget w{};
 	if (_CrtDumpMemoryLeaks()) {
 		std::cout << "Exista memory leaks! :(\n";
 	}

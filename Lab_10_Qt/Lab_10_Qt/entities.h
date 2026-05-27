@@ -16,7 +16,7 @@ public:
 	Masina(std::string id, std::string nrInmatriculare, std::string producator, std::string model, std::string tip) :id{ id }, nrInmatriculare{ nrInmatriculare }, producator{ producator }, model{ model }, tip{ tip } {
 
 	} // Constructor obisnuit
-	
+
 
 	std::string getId() const;
 	std::string getNrInmatriculare() const;
@@ -67,8 +67,8 @@ public:
 		id{ std::move(other.id) },
 		nrInmatriculare{ std::move(other.nrInmatriculare) },
 		producator{ std::move(other.producator) },
-		model{std::move(other.model)},
-		tip{std::move(other.tip)}
+		model{ std::move(other.model) },
+		tip{ std::move(other.tip) }
 	{
 		std::cout << "Move Constructor\n";
 
@@ -86,12 +86,12 @@ public:
 		producator = std::move(other.producator);
 		model = std::move(other.model);
 		tip = std::move(other.tip);
-		
+
 		std::cout << "Move Assignment Operator\n";
 		return *this;
 	}
 
-	bool operator == (const Masina& ot) const noexcept{
+	bool operator == (const Masina& ot) const noexcept {
 		return this->id == ot.id &&
 			this->nrInmatriculare == ot.nrInmatriculare &&
 			this->producator == ot.producator &&
@@ -100,5 +100,5 @@ public:
 	}
 
 	// constructor manual de distrugere
-	~Masina(){};
+	~Masina() {};
 };
